@@ -1,6 +1,11 @@
 <template>
   <div>
-    <img src="../assets/hero.png" class="hero">
+    <div v-if="insight" class="card insight">
+      <h2>Din förbrukning</h2>
+      <p>{{ insight }}</p>
+    </div>
+    <!-- don't show the hero before data is in, page looked empty /J -->
+    <img v-if="consumptionStore.data" src="../assets/hero.png" class="hero">
     <h1 v-if="userStore.user">Hej {{ userStore.user.name.split(' ')[0] }}!</h1>
     <h1 v-else>Hej!</h1>
 
@@ -57,6 +62,14 @@ const latestMonth = computed(() => {
   return d ? d.values[d.values.length - 1] : '–'
 })
 
+const insight = computed(() => {
+  var d = consumptionStore.data
+  if (!d || d.values.length < 2) return null
+  var last = d.values[d.values.length - 1], prev = d.values[d.values.length - 2]
+  var diff = Math.round(Math.abs(last - prev) / prev * 100)
+  return 'Senaste månaden (' + d.months[d.months.length - 1].toLowerCase() + ') använde du ' + diff + ' % ' + (last < prev ? 'mindre' : 'mer') + ' el än månaden innan. ' + (last < prev ? 'Snyggt jobbat!' : 'Kolla spartipsen längre ner.')
+})
+
 const currentPrice = computed(() => formatPrice(consumptionStore.data?.pricePerKwh))
 
 // debounce on resize, chart.js redraws itself but we log a bit /J
@@ -79,6 +92,7 @@ const showTips = () => {
 
 <style scoped>
 .hero { width: 100%; border-radius: 10px; margin-bottom: 18px; }
+.insight { border-left: 4px solid #16a34a; }
 .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 .stat-label { font-size: 13px; color: #7c8698; margin-bottom: 6px; }
 .stat-value { font-size: 26px; font-weight: 700; }

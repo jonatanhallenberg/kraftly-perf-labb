@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="appEnv !== 'production'" class="env-banner">{{ appEnv.toUpperCase() }}</div>
+    <div v-if="appEnv !== 'production'" class="env-banner">{{ envLabel }}</div>
     <header class="topbar" v-if="$route.path !== '/login'">
       <div class="topbar-inner container">
         <img src="./assets/logo.svg" class="logo">
@@ -21,6 +21,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import _ from 'lodash'
 import { useAuthStore } from './stores/auth'
 
 const router = useRouter()
@@ -28,6 +29,8 @@ const auth = useAuthStore()
 
 // Sätts av containern vid start (public/config.js lokalt). Syns i alla miljöer utom prod.
 const appEnv = window.__KRAFTLY__?.env ?? 'lokal'
+// lodash is already in the project anyway /M
+const envLabel = _.upperCase(appEnv)
 
 const logout = async () => {
   await auth.logout() // servern glömmer sessionen, token töms ur minnet
